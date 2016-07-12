@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version     = Dk::ABDeploy::VERSION
   gem.authors     = ["Kelly Redding", "Collin Redding"]
   gem.email       = ["kelly@kellyredding.com", "collin.redding@me.com"]
-  gem.summary     = "Dk tasks that implement the A/B deploy pattern"
-  gem.description = "Dk tasks that implement the A/B deploy pattern"
+  gem.summary     = "Dk tasks that implement the A/B deploy scheme"
+  gem.description = "Dk tasks that implement the A/B deploy scheme"
   gem.homepage    = "https://github.com/redding/dk-abdeploy"
   gem.license     = 'MIT'
 
