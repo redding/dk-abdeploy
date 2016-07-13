@@ -63,16 +63,16 @@ class Dk::ABDeploy::Setup
       exp = "mkdir -p #{@root} #{@shared} #{@releases} #{@release_a} #{@release_b}"
       assert_equal exp, mkdir_ssh.cmd_str
 
-      exp = clone_cmd(@repo, @release_a)
+      exp = clone_cmd_str(@repo, @release_a)
       assert_equal exp, clone_a_ssh.cmd_str
 
-      exp = clone_cmd(@repo, @release_b)
+      exp = clone_cmd_str(@repo, @release_b)
       assert_equal exp, clone_b_ssh.cmd_str
     end
 
     private
 
-    def clone_cmd(repo, release_dir)
+    def clone_cmd_str(repo, release_dir)
       "if [ -d #{release_dir}/.git ]; " \
       "then echo 'git repo already cloned to #{release_dir}'; " \
       "else git clone -q  #{repo} #{release_dir}; " \
