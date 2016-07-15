@@ -1,6 +1,6 @@
-require 'pathname'
 require 'dk/task'
 require 'dk-abdeploy/validate'
+require 'dk-abdeploy'
 
 module Dk::ABDeploy
 
@@ -22,16 +22,16 @@ module Dk::ABDeploy
         params[RELEASE_A_DIR_PARAM_NAME],
         params[RELEASE_B_DIR_PARAM_NAME]
       ]
-      ssh "mkdir -p #{mkdirs.join(' ')}"
+      ssh! "mkdir -p #{mkdirs.join(' ')}"
 
       # clone the A/B release repos if not already cloned
-      ssh clone_cmd(params[REPO_PARAM_NAME], params[RELEASE_A_DIR_PARAM_NAME])
-      ssh clone_cmd(params[REPO_PARAM_NAME], params[RELEASE_B_DIR_PARAM_NAME])
+      ssh! clone_cmd_str(params[REPO_PARAM_NAME], params[RELEASE_A_DIR_PARAM_NAME])
+      ssh! clone_cmd_str(params[REPO_PARAM_NAME], params[RELEASE_B_DIR_PARAM_NAME])
     end
 
     private
 
-    def clone_cmd(repo, release_dir)
+    def clone_cmd_str(repo, release_dir)
       "if [ -d #{release_dir}/.git ]; " \
       "then echo 'git repo already cloned to #{release_dir}'; " \
       "else git clone -q  #{repo} #{release_dir}; " \

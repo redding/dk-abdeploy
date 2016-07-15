@@ -20,7 +20,8 @@ module Dk::ABDeploy
 
       # set common required params for downstream tasks
       deploy_root = Pathname.new(params[ROOT_PARAM_NAME])
-      set_param(SHARED_DIR_PARAM_NAME, deploy_root.join(SHARED_DIR_NAME).to_s)
+      set_param(SHARED_DIR_PARAM_NAME,  deploy_root.join(SHARED_DIR_NAME).to_s)
+      set_param(CURRENT_DIR_PARAM_NAME, deploy_root.join(CURRENT_LINK_NAME).to_s)
 
       releases_dir = deploy_root.join(RELEASES_DIR_NAME)
       set_param(RELEASES_DIR_PARAM_NAME,  releases_dir.to_s)

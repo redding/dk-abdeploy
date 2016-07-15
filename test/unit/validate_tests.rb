@@ -44,6 +44,9 @@ class Dk::ABDeploy::Validate
       exp = File.join(@root, Dk::ABDeploy::SHARED_DIR_NAME)
       assert_equal exp, subject.params[Dk::ABDeploy::SHARED_DIR_PARAM_NAME]
 
+      exp = File.join(@root, Dk::ABDeploy::CURRENT_LINK_NAME)
+      assert_equal exp, subject.params[Dk::ABDeploy::CURRENT_DIR_PARAM_NAME]
+
       exp = File.join(@root, Dk::ABDeploy::RELEASES_DIR_NAME)
       assert_equal exp, subject.params[Dk::ABDeploy::RELEASES_DIR_PARAM_NAME]
 
