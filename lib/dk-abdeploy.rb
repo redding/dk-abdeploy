@@ -24,3 +24,9 @@ module Dk::ABDeploy
   SSH_HOSTS_GROUP_NAME = 'dk_abdeploy_servers'.freeze
 
 end
+
+# require the tasks for convenience (needs to be after consts defined above)
+require 'dk-abdeploy/link'
+require 'dk-abdeploy/update'
+require 'dk-abdeploy/setup'
+require 'dk-abdeploy/validate'
