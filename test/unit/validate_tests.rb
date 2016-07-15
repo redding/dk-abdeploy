@@ -31,11 +31,16 @@ class Dk::ABDeploy::Validate
     setup do
       @root = Factory.path
       @repo = Factory.string
+
       @params = {
         Dk::ABDeploy::ROOT_PARAM_NAME => @root,
         Dk::ABDeploy::REPO_PARAM_NAME => @repo
       }
       @runner = test_runner(@task_class, :params => @params)
+
+      @hosts = Factory.integer(3).times.map{ Factory.string }
+      @runner.ssh_hosts(Dk::ABDeploy::SSH_HOSTS_GROUP_NAME, @hosts)
+
       @runner.run
     end
     subject{ @runner }
@@ -62,22 +67,13 @@ class Dk::ABDeploy::Validate
     should "complain if the root/repo params aren't set" do
       value = [nil, ''].sample
 
-      runner = test_runner(@task_class, :params => {
-        Dk::ABDeploy::ROOT_PARAM_NAME => value,
-        Dk::ABDeploy::REPO_PARAM_NAME => value
-      })
+      @params[@params.keys.sample] = value
+      runner = test_runner(@task_class, :params => @params)
       assert_raises(ArgumentError){ runner.run }
+    end
 
-      runner = test_runner(@task_class, :params => {
-        Dk::ABDeploy::ROOT_PARAM_NAME => Factory.path,
-        Dk::ABDeploy::REPO_PARAM_NAME => value
-      })
-      assert_raises(ArgumentError){ runner.run }
-
-      runner = test_runner(@task_class, :params => {
-        Dk::ABDeploy::ROOT_PARAM_NAME => value,
-        Dk::ABDeploy::REPO_PARAM_NAME => Factory.string
-      })
+    should "complain if the ssh hosts aren't set" do
+      runner = test_runner(@task_class, :params => @params)
       assert_raises(ArgumentError){ runner.run }
     end
 

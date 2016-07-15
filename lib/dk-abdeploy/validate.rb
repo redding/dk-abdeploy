@@ -18,6 +18,11 @@ module Dk::ABDeploy
         raise ArgumentError, "no #{REPO_PARAM_NAME.inspect} param set"
       end
 
+      # make sure the hosts group has been set
+      if (h = ssh_hosts(SSH_HOSTS_GROUP_NAME)).nil? || h.empty?
+        raise ArgumentError, "no #{SSH_HOSTS_GROUP_NAME.inspect} have been set"
+      end
+
       # set common required params for downstream tasks
       deploy_root = Pathname.new(params[ROOT_PARAM_NAME])
       set_param(SHARED_DIR_PARAM_NAME,  deploy_root.join(SHARED_DIR_NAME).to_s)
