@@ -37,7 +37,8 @@ module Dk::ABDeploy
           Dk::ABDeploy::RELEASE_B_DIR_NAME
         )
 
-        @params = {
+        @params ||= {}
+        @params.merge!({
           Dk::ABDeploy::ROOT_PARAM_NAME          => @dk_abdeploy_root,
           Dk::ABDeploy::REPO_PARAM_NAME          => @dk_abdeploy_repo,
           Dk::ABDeploy::SHARED_DIR_PARAM_NAME    => @dk_abdeploy_shared,
@@ -45,7 +46,18 @@ module Dk::ABDeploy
           Dk::ABDeploy::RELEASES_DIR_PARAM_NAME  => @dk_abdeploy_releases,
           Dk::ABDeploy::RELEASE_A_DIR_PARAM_NAME => @dk_abdeploy_release_a,
           Dk::ABDeploy::RELEASE_B_DIR_PARAM_NAME => @dk_abdeploy_release_b
-        }
+        })
+      end
+
+      def set_dk_abdeploy_update_params
+        release_dirs = [
+          @params[Dk::ABDeploy::RELEASE_A_DIR_PARAM_NAME],
+          @params[Dk::ABDeploy::RELEASE_B_DIR_PARAM_NAME]
+        ]
+
+        @params[Dk::ABDeploy::CURRENT_RELEASE_DIR_PARAM_NAME] = release_dirs.sample
+        release_dirs.delete(@params[Dk::ABDeploy::CURRENT_RELEASE_DIR_PARAM_NAME])
+        @params[Dk::ABDeploy::DEPLOY_RELEASE_DIR_PARAM_NAME] = release_dirs.first
       end
 
     end
