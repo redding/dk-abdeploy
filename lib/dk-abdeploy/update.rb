@@ -1,3 +1,4 @@
+require 'much-plugin'
 require 'dk/task'
 require "dk-abdeploy/constants"
 require 'dk-abdeploy/validate'
@@ -50,6 +51,28 @@ module Dk::ABDeploy
       "git fetch -q origin && " \
       "git reset -q --hard #{ref} && " \
       "git clean -q -d -x -f"
+    end
+
+    module TestHelpers
+      include MuchPlugin
+
+      plugin_included do
+        include Dk::Task::TestHelpers
+        include Dk::ABDeploy::Validate::TestHelpers
+
+        setup do
+          release_dirs = [
+            @params[Dk::ABDeploy::RELEASE_A_DIR_PARAM_NAME],
+            @params[Dk::ABDeploy::RELEASE_B_DIR_PARAM_NAME]
+          ]
+
+          @params[Dk::ABDeploy::CURRENT_RELEASE_DIR_PARAM_NAME] ||= release_dirs.sample
+          release_dirs.delete(@params[Dk::ABDeploy::CURRENT_RELEASE_DIR_PARAM_NAME])
+          @params[Dk::ABDeploy::DEPLOY_RELEASE_DIR_PARAM_NAME] ||= release_dirs.first
+        end
+
+      end
+
     end
 
   end

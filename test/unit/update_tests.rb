@@ -147,6 +147,44 @@ class Dk::ABDeploy::Update
       "git clean -q -d -x -f"
     end
 
+  end
+
+  class TestHelpersTests < UnitTests
+    desc "TestHelpers"
+    setup do
+      @context_class = Class.new do
+        def self.setup_blocks; @setup_blocks ||= []; end
+        def self.setup(&block)
+          self.setup_blocks << block
+        end
+        include Dk::ABDeploy::Update::TestHelpers
+        attr_reader :params
+        def initialize
+          self.class.setup_blocks.each{ |b| self.instance_eval(&b) }
+        end
+      end
+      @context = @context_class.new
+    end
+    subject{ @context }
+
+    should "use much-plugin" do
+      assert_includes MuchPlugin, @context_class
+    end
+
+    should "setup the params the update task does" do
+      exp_release_dirs = [
+        subject.params[Dk::ABDeploy::RELEASE_A_DIR_PARAM_NAME],
+        subject.params[Dk::ABDeploy::RELEASE_B_DIR_PARAM_NAME]
+      ]
+
+      exp_release_dirs.delete(
+        subject.params[Dk::ABDeploy::CURRENT_RELEASE_DIR_PARAM_NAME]
+      )
+      assert_equal 1, exp_release_dirs.size
+
+      exp = exp_release_dirs.first
+      assert_equal exp, subject.params[Dk::ABDeploy::DEPLOY_RELEASE_DIR_PARAM_NAME]
+    end
 
   end
 
