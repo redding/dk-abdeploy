@@ -20,7 +20,7 @@ class Dk::ABDeploy::Update
     end
 
     should "know its description" do
-      exp = "(dk-abdeploy) updated the non-current release's source"
+      exp = "(dk-abdeploy) update the non-current release's source"
       assert_equal exp, subject.description
     end
 

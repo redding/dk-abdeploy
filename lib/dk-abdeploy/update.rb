@@ -7,7 +7,7 @@ module Dk::ABDeploy
   class Update
     include Dk::Task
 
-    desc "(dk-abdeploy) updated the non-current release's source"
+    desc "(dk-abdeploy) update the non-current release's source"
 
     before Validate
 
