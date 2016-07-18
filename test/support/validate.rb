@@ -1,5 +1,6 @@
 require 'much-plugin'
 require 'dk/task'
+require 'dk-abdeploy/test_helpers'
 require 'dk-abdeploy/validate'
 
 class Dk::ABDeploy::Validate
@@ -9,25 +10,18 @@ class Dk::ABDeploy::Validate
 
     plugin_included do
       include Dk::Task::TestHelpers
+      include Dk::ABDeploy::TestHelpers
 
       setup do
-        @root      = Factory.path
-        @repo      = Factory.string
-        @shared    = File.join(@root,     Dk::ABDeploy::SHARED_DIR_NAME)
-        @current   = File.join(@root,     Dk::ABDeploy::CURRENT_LINK_NAME)
-        @releases  = File.join(@root,     Dk::ABDeploy::RELEASES_DIR_NAME)
-        @release_a = File.join(@releases, Dk::ABDeploy::RELEASE_A_DIR_NAME)
-        @release_b = File.join(@releases, Dk::ABDeploy::RELEASE_B_DIR_NAME)
+        set_dk_abdeploy_validate_params
 
-        @params = {
-          Dk::ABDeploy::ROOT_PARAM_NAME          => @root,
-          Dk::ABDeploy::REPO_PARAM_NAME          => @repo,
-          Dk::ABDeploy::SHARED_DIR_PARAM_NAME    => @shared,
-          Dk::ABDeploy::CURRENT_DIR_PARAM_NAME   => @current,
-          Dk::ABDeploy::RELEASES_DIR_PARAM_NAME  => @releases,
-          Dk::ABDeploy::RELEASE_A_DIR_PARAM_NAME => @release_a,
-          Dk::ABDeploy::RELEASE_B_DIR_PARAM_NAME => @release_b
-        }
+        @root      = @dk_abdeploy_root
+        @repo      = @dk_abdeploy_repo
+        @shared    = @dk_abdeploy_shared
+        @current   = @dk_abdeploy_current
+        @releases  = @dk_abdeploy_releases
+        @release_a = @dk_abdeploy_release_a
+        @release_b = @dk_abdeploy_release_b
       end
 
     end
