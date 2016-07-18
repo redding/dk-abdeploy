@@ -1,6 +1,6 @@
 require 'dk/task'
+require "dk-abdeploy/constants"
 require 'dk-abdeploy/validate'
-require 'dk-abdeploy'
 
 module Dk::ABDeploy
 

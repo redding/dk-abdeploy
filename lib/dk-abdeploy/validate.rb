@@ -1,6 +1,6 @@
 require 'pathname'
 require 'dk/task'
-require 'dk-abdeploy'
+require "dk-abdeploy/constants"
 
 module Dk::ABDeploy
 
