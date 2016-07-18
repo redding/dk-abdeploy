@@ -50,6 +50,24 @@ module Dk::ABDeploy::TestHelpers
       assert_equal exp, subject.params[Dk::ABDeploy::RELEASE_B_DIR_PARAM_NAME]
     end
 
+    should "setup the params the update task does" do
+      subject.set_dk_abdeploy_validate_params
+      subject.set_dk_abdeploy_update_params
+
+      exp_release_dirs = [
+        subject.params[Dk::ABDeploy::RELEASE_A_DIR_PARAM_NAME],
+        subject.params[Dk::ABDeploy::RELEASE_B_DIR_PARAM_NAME]
+      ]
+
+      exp_release_dirs.delete(
+        subject.params[Dk::ABDeploy::CURRENT_RELEASE_DIR_PARAM_NAME]
+      )
+      assert_equal 1, exp_release_dirs.size
+
+      exp = exp_release_dirs.first
+      assert_equal exp, subject.params[Dk::ABDeploy::DEPLOY_RELEASE_DIR_PARAM_NAME]
+    end
+
   end
 
 end
