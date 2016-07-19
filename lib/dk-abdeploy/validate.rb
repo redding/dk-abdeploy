@@ -10,6 +10,8 @@ module Dk::ABDeploy
 
     desc "(dk-abdeploy) validate the required dk-abdeploy params"
 
+    run_only_once true
+
     def run!
       # validate required params are set
       if params[ROOT_PARAM_NAME].to_s.empty?

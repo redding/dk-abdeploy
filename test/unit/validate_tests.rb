@@ -22,6 +22,10 @@ class Dk::ABDeploy::Validate
       assert_equal exp, subject.description
     end
 
+    should "run only once" do
+      assert_true subject.run_only_once
+    end
+
   end
 
   class RunTests < UnitTests
