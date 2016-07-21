@@ -1,3 +1,5 @@
+require 'dk-abdeploy/constants'
+
 module Dk; end
 module Dk::ABDeploy; end
 module Dk::ABDeploy::Utils
