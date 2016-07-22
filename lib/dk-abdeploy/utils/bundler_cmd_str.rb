@@ -6,15 +6,13 @@ module Dk::ABDeploy::Utils
 
   module BundlerCmdStr
 
-    def self.new(params, cmd_str, opts = nil)
+    def self.new(cmd_str, params, opts = nil)
       opts ||= {}
 
-      opts[:root] ||= Dk::ABDeploy::CURRENT_DIR_PARAM_NAME
-      opts[:env]  ||= ""
+      opts[:root_param] ||= Dk::ABDeploy::CURRENT_DIR_PARAM_NAME
+      opts[:env]        ||= ""
 
-      cmd_root = params.key?(opts[:root]) ? params[opts[:root]] : opts[:root]
-
-      "cd #{cmd_root} && #{opts[:env]} bundle exec #{cmd_str}"
+      "cd #{params[opts[:root_param]]} && #{opts[:env]} bundle #{cmd_str}"
     end
 
     module TestHelpers
