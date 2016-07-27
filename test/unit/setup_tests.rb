@@ -15,7 +15,7 @@ class Dk::ABDeploy::Setup
     end
     subject{ @task_class }
 
-    should "be a Dk::Task" do
+    should "be a Dk task" do
       assert_includes Dk::Task, subject
     end
 
