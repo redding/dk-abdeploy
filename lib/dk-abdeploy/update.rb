@@ -14,6 +14,13 @@ module Dk::ABDeploy
 
     ssh_hosts SSH_HOSTS_GROUP_NAME
 
+    def self.git_reset_cmd_str(repo_dir, ref)
+      "cd #{repo_dir} && " \
+      "git fetch -q origin && " \
+      "git reset -q --hard #{ref} && " \
+      "git clean -q -d -x -f"
+    end
+
     def run!
       # validate required params are set
       if params[REF_PARAM_NAME].to_s.empty?
@@ -47,10 +54,7 @@ module Dk::ABDeploy
     end
 
     def git_reset_cmd_str(repo_dir, ref)
-      "cd #{repo_dir} && " \
-      "git fetch -q origin && " \
-      "git reset -q --hard #{ref} && " \
-      "git clean -q -d -x -f"
+      self.class.git_reset_cmd_str(repo_dir, ref)
     end
 
     module TestHelpers
