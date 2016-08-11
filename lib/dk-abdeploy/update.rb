@@ -14,6 +14,10 @@ module Dk::ABDeploy
 
     ssh_hosts SSH_HOSTS_GROUP_NAME
 
+    def self.readlink_cmd_str(link)
+      "readlink #{link}"
+    end
+
     def self.git_reset_cmd_str(repo_dir, ref)
       "cd #{repo_dir} && " \
       "git fetch -q origin && " \
@@ -31,15 +35,17 @@ module Dk::ABDeploy
       end
 
       # lookup the current release dir; set current/deploy release dir params
-      rl_cmd = cmd readlink_cmd_str(params[CURRENT_DIR_PARAM_NAME], {
-        :host => params[PRIMARY_SSH_HOST_PARAM_NAME]
-      })
-      set_param(CURRENT_RELEASE_DIR_PARAM_NAME, rl_cmd.stdout.strip)
-
       release_dirs = [
         params[RELEASE_A_DIR_PARAM_NAME],
         params[RELEASE_B_DIR_PARAM_NAME]
       ]
+
+      rl_ssh = ssh(readlink_cmd_str(params[CURRENT_DIR_PARAM_NAME]), {
+        :hosts => params[PRIMARY_SSH_HOST_PARAM_NAME]
+      })
+      current_dir = (o = rl_ssh.stdout.strip).empty? ? release_dirs.last : o
+      set_param(CURRENT_RELEASE_DIR_PARAM_NAME, current_dir)
+
       release_dirs.delete(params[CURRENT_RELEASE_DIR_PARAM_NAME])
       set_param(DEPLOY_RELEASE_DIR_PARAM_NAME, release_dirs.first)
 
@@ -49,8 +55,8 @@ module Dk::ABDeploy
 
     private
 
-    def readlink_cmd_str(link, ssh_opts)
-      ssh_cmd_str("readlink #{link}", ssh_opts)
+    def readlink_cmd_str(link)
+      self.class.readlink_cmd_str(link)
     end
 
     def git_reset_cmd_str(repo_dir, ref)
