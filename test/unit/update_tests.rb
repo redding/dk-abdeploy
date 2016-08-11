@@ -15,6 +15,8 @@ class Dk::ABDeploy::Update
     end
     subject{ @task_class }
 
+    should have_imeths :git_reset_cmd_str
+
     should "be a Dk task" do
       assert_includes Dk::Task, subject
     end
@@ -26,6 +28,17 @@ class Dk::ABDeploy::Update
 
     should "run the Validate task as a before callback" do
       assert_equal [Dk::ABDeploy::Validate], subject.before_callback_task_classes
+    end
+
+    should "build git reset cmd strs" do
+      repo_dir = Factory.path
+      ref      = Factory.string
+
+      exp = "cd #{repo_dir} && " \
+            "git fetch -q origin && " \
+            "git reset -q --hard #{ref} && " \
+            "git clean -q -d -x -f"
+      assert_equal exp, subject.git_reset_cmd_str(repo_dir, ref)
     end
 
   end
@@ -108,7 +121,7 @@ class Dk::ABDeploy::Update
       repo_dir = @params[Dk::ABDeploy::RELEASE_A_DIR_PARAM_NAME]
       ref      = @params[Dk::ABDeploy::REF_PARAM_NAME]
 
-      exp = git_reset_cmd_str(repo_dir, ref)
+      exp = @task_class.git_reset_cmd_str(repo_dir, ref)
       assert_equal exp, git_reset_ssh.cmd_str
     end
 
@@ -122,7 +135,7 @@ class Dk::ABDeploy::Update
       assert_raises(ArgumentError){ runner.run }
 
       runner = test_runner(@task_class, :params => {
-        Dk::ABDeploy::REF_PARAM_NAME              => Factory.path,
+        Dk::ABDeploy::REF_PARAM_NAME              => Factory.string,
         Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME => value
       })
       assert_raises(ArgumentError){ runner.run }
@@ -138,13 +151,6 @@ class Dk::ABDeploy::Update
 
     def readlink_cmd_str(task, link, ssh_opts)
       ssh_cmd_str(task, "readlink #{link}", ssh_opts)
-    end
-
-    def git_reset_cmd_str(repo_dir, ref)
-      "cd #{repo_dir} && " \
-      "git fetch -q origin && " \
-      "git reset -q --hard #{ref} && " \
-      "git clean -q -d -x -f"
     end
 
   end
