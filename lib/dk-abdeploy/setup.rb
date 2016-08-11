@@ -33,7 +33,7 @@ module Dk::ABDeploy
 
     def clone_cmd_str(repo, release_dir)
       "if [ -d #{release_dir}/.git ]; " \
-      "then echo 'git repo already cloned to #{release_dir}'; " \
+      "then echo 'repo already cloned'; " \
       "else git clone -q  #{repo} #{release_dir}; " \
       "fi"
     end
