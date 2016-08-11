@@ -15,7 +15,7 @@ class Dk::ABDeploy::Update
     end
     subject{ @task_class }
 
-    should have_imeths :git_reset_cmd_str
+    should have_imeths :readlink_cmd_str, :git_reset_cmd_str
 
     should "be a Dk task" do
       assert_includes Dk::Task, subject
@@ -28,6 +28,13 @@ class Dk::ABDeploy::Update
 
     should "run the Validate task as a before callback" do
       assert_equal [Dk::ABDeploy::Validate], subject.before_callback_task_classes
+    end
+
+    should "build readlink cmd strs" do
+      link = Factory.path
+
+      exp = "readlink #{link}"
+      assert_equal exp, subject.readlink_cmd_str(link)
     end
 
     should "build git reset cmd strs" do
@@ -66,13 +73,8 @@ class Dk::ABDeploy::Update
   class RunTests < InitTests
     desc "and run"
     setup do
-      @curr = @params[Dk::ABDeploy::CURRENT_DIR_PARAM_NAME]
-      @host = @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
-
-      @rl_cmd_str = readlink_cmd_str(@task, @curr, :host => @host)
-
-      @curr_release_dir = Factory.path
-      @runner.stub_cmd(@rl_cmd_str){ |spy| spy.stdout = @curr_release_dir }
+      @curr_link  = @params[Dk::ABDeploy::CURRENT_DIR_PARAM_NAME]
+      @rl_cmd_str = @task_class.readlink_cmd_str(@curr_link)
 
       @runner.run
     end
@@ -82,13 +84,32 @@ class Dk::ABDeploy::Update
       assert_equal 3, subject.runs.size
     end
 
-    should "run a readlink cmd over ssh to set the current release dir param" do
-      _, readlink_cmd, _ = subject.runs
+    should "run a readlink ssh to set or default the current release dir param" do
+      _, rl_ssh, _ = subject.runs
 
-      assert_equal @rl_cmd_str, readlink_cmd.cmd_str
+      exp = @task_class.readlink_cmd_str(@params[Dk::ABDeploy::CURRENT_DIR_PARAM_NAME])
+      assert_equal exp, rl_ssh.cmd_str
+      exp = [@params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]]
+      assert_equal exp, rl_ssh.cmd_opts[:hosts]
+    end
 
-      exp = @curr_release_dir
-      assert_equal exp, subject.params[Dk::ABDeploy::CURRENT_RELEASE_DIR_PARAM_NAME]
+    should "set the current release dir param or default it to the B dir if none" do
+      curr_release_dir = Factory.path
+      runner = test_runner(@task_class, :params => @params)
+      runner.stub_ssh(@rl_cmd_str, {
+        :hosts => @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
+      }){ |spy| spy.stdout = curr_release_dir }
+      runner.run
+      exp = curr_release_dir
+      assert_equal exp, runner.params[Dk::ABDeploy::CURRENT_RELEASE_DIR_PARAM_NAME]
+
+      runner = test_runner(@task_class, :params => @params)
+      runner.stub_ssh(@rl_cmd_str, {
+        :hosts => @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
+      }){ |spy| spy.stdout = '' }
+      runner.run
+      exp = @params[Dk::ABDeploy::RELEASE_B_DIR_PARAM_NAME]
+      assert_equal exp, runner.params[Dk::ABDeploy::CURRENT_RELEASE_DIR_PARAM_NAME]
     end
 
     should "set the deploy release dir to the A dir by default" do
@@ -100,7 +121,9 @@ class Dk::ABDeploy::Update
       # if current is A, set deploy to B
       curr_release_dir = @params[Dk::ABDeploy::RELEASE_A_DIR_PARAM_NAME]
       runner = test_runner(@task_class, :params => @params)
-      runner.stub_cmd(@rl_cmd_str){ |spy| spy.stdout = curr_release_dir }
+      runner.stub_ssh(@rl_cmd_str, {
+        :hosts => @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
+      }){ |spy| spy.stdout = curr_release_dir }
       runner.run
 
       exp = @params[Dk::ABDeploy::RELEASE_B_DIR_PARAM_NAME]
@@ -109,7 +132,9 @@ class Dk::ABDeploy::Update
       # if current is B, set deploy to A
       curr_release_dir = @params[Dk::ABDeploy::RELEASE_B_DIR_PARAM_NAME]
       runner = test_runner(@task_class, :params => @params)
-      runner.stub_cmd(@rl_cmd_str){ |spy| spy.stdout = curr_release_dir }
+      runner.stub_ssh(@rl_cmd_str, {
+        :hosts => @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
+      }){ |spy| spy.stdout = curr_release_dir }
       runner.run
 
       exp = @params[Dk::ABDeploy::RELEASE_A_DIR_PARAM_NAME]
