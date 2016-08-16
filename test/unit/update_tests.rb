@@ -97,7 +97,9 @@ class Dk::ABDeploy::Update
       curr_release_dir = Factory.path
       runner = test_runner(@task_class, :params => @params)
       runner.stub_ssh(@rl_cmd_str, {
-        :hosts => @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
+        :opts => {
+          :hosts => @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
+        }
       }){ |spy| spy.stdout = curr_release_dir }
       runner.run
       exp = curr_release_dir
@@ -105,7 +107,9 @@ class Dk::ABDeploy::Update
 
       runner = test_runner(@task_class, :params => @params)
       runner.stub_ssh(@rl_cmd_str, {
-        :hosts => @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
+        :opts => {
+          :hosts => @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
+        }
       }){ |spy| spy.stdout = '' }
       runner.run
       exp = @params[Dk::ABDeploy::RELEASE_B_DIR_PARAM_NAME]
@@ -122,7 +126,9 @@ class Dk::ABDeploy::Update
       curr_release_dir = @params[Dk::ABDeploy::RELEASE_A_DIR_PARAM_NAME]
       runner = test_runner(@task_class, :params => @params)
       runner.stub_ssh(@rl_cmd_str, {
-        :hosts => @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
+        :opts => {
+          :hosts => @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
+        }
       }){ |spy| spy.stdout = curr_release_dir }
       runner.run
 
@@ -133,7 +139,9 @@ class Dk::ABDeploy::Update
       curr_release_dir = @params[Dk::ABDeploy::RELEASE_B_DIR_PARAM_NAME]
       runner = test_runner(@task_class, :params => @params)
       runner.stub_ssh(@rl_cmd_str, {
-        :hosts => @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
+        :opts => {
+          :hosts => @params[Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME]
+        }
       }){ |spy| spy.stdout = curr_release_dir }
       runner.run
 
