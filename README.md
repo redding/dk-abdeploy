@@ -17,7 +17,80 @@ This has a few advantages over a more tradition single-clone deploy scheme:
 
 ## Usage
 
-TODO: Write code samples and usage instructions here
+Here is an example "deploy" task that uses dk-abdeploy tasks to compose it's logic:
+
+```ruby
+# in config/dk.rb or whatever
+require 'dk'
+require 'dk-abdeploy'
+
+class MyDeployTask
+  incude Dk::Task
+
+  desc "deploy my code"
+
+  ssh_hosts 'my_servers'
+
+  def run!
+    # set any required dk-abdeploy params before validating
+    set_param(Dk::ABDeploy::ROOT_PARAM_NAME, params['deploy_dir'])
+    set_param(Dk::ABDeploy::REPO_PARAM_NAME, params['repo_url'])
+    set_param(Dk::ABDeploy::REF_PARAM_NAME,  'origin/master')
+    set_param(
+      Dk::ABDeploy::PRIMARY_SSH_HOST_PARAM_NAME,
+      ssh_hosts('my_servers').first
+    )
+
+    # validate the deploy params, config, etc (safe to run on each deploy)
+    run_task Dk::ABDeploy::Validate
+
+    # do post-validate custom logic (like maybe setting more friendly param names?)
+    set_param('shared_dir',  params[Dk::ABDeploy::SHARED_DIR_PARAM_NAME])
+    set_param('current_dir', params[Dk::ABDeploy::CURRENT_DIR_PARAM_NAME])
+
+    # setup the deploy dirs, etc (safe to run on each deploy)
+    run_task Dk::ABDeploy::Setup
+
+    # update the source in either the A or B release dir (whichever is not current)
+    run_task Dk::ABDeploy::Update
+
+    # do any custom post-source-update logic like:
+    # - set more "friendly" param names
+    # - bundle
+    # - build assets
+    # - etc
+    set_param('deploy_release_dir', release_dir)
+
+    # symlink the release dir that was just updated as the "current"
+    run_task Dk::ABDeploy::Link
+
+    # do any post-symlink logic like (restarting processes, etc)
+
+    # cleanup the deploy
+    # (gets the non-updated release dir on the same commit as the updated release dir)
+    run_task Dk::ABDeploy::Cleanup
+  end
+
+end
+
+Dk.configure do
+  task 'deploy', MyDeployTask
+
+  set_param 'repo_url',   'some-repo-rul'
+  set_param 'deploy_dir', '/path/to/my/code'
+
+  ssh_hosts 'my_servers', 'myhost1.example.com',
+                          'myhost2.example.com'
+end
+```
+
+then...
+
+```
+$ dk -T
+deploy     # deploy my code
+$ dk deploy
+```
 
 ## Notes
 
